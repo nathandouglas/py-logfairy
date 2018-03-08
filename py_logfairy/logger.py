@@ -29,7 +29,7 @@ def get_logger(filename, max_bytes=None,
         <logging.Logger>
     """
     logger = logging.getLogger() or base_logger
-    log_name = logdir + filename + '-worker'
+    log_name = logdir + filename
     max_bytes = max_bytes or 10*1024*1024 # 10 MiB
 
     conf = conf or {
