@@ -1,6 +1,49 @@
 import logging
+import structlog
+import sys
 
 from logging.handlers import RotatingFileHandler
+
+
+def configure_structlog():
+    structlog.configure(
+        processors=get_processors(),
+        context_class=dict,
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        wrapper_class=structlog.stdlib.BoundLogger,
+        cache_logger_on_first_use=True,
+    )
+
+
+def get_processors():
+    py27_processors = [
+        structlog.stdlib.filter_by_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeEncoder(),
+        structlog.processors.JSONRenderer(ensure_ascii=False)
+    ]
+
+    py3_processors = [
+        structlog.stdlib.filter_by_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        structlog.processors.JSONRenderer(ensure_ascii=False)
+    ]
+
+    if sys.version_info[0] < 3:
+        return py27_processors
+    else:
+        return py3_processors
 
 
 def get_logger(filename, max_bytes=None,
@@ -28,7 +71,12 @@ def get_logger(filename, max_bytes=None,
     Returns:
         <logging.Logger>
     """
-    logger = logging.getLogger() or base_logger
+    configure_structlog()
+
+    logger = structlog.get_logger()
+
+    logger.setLevel(logging.INFO)
+
     log_name = logdir + filename
     max_bytes = max_bytes or 10*1024*1024 # 10 MiB
 
