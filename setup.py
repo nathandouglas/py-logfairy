@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='py_logfairy',
       version='0.1',
@@ -7,5 +7,5 @@ setup(name='py_logfairy',
       author='Nathan Douglas',
       author_email='nathan.a.douglas@gmail.com',
       license='MIT',
-      packages=['py_logfairy'],
+      packages=find_packages(),
       zip_safe=False)
