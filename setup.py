@@ -8,4 +8,5 @@ setup(name='py_logfairy',
       author_email='nathan.a.douglas@gmail.com',
       license='MIT',
       packages=find_packages(),
+      install_requires=['structlog'],
       zip_safe=False)
